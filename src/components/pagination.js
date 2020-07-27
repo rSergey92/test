@@ -1,23 +1,26 @@
 export default class Pagination {
     constructor(wrapper) {
         this.wrapper = wrapper;
-        this.render();
+        this.buttonSelector = 'page-item';
     }
 
-    createPagination() {
+    createPagination(countOfItem) {
         const paginationBlock = document.createElement('nav');
-        paginationBlock.appendChild(this.getListPage());
+        const list = this.createList('ul');
+        for (let i = 1; i <= countOfItem; i++) {
+            list.appendChild(this.getListPage(i));
+        }
+
+        paginationBlock.appendChild(list);
 
         return paginationBlock;
     }
 
-    getListPage() {
-        const list = this.createList('ul');
+    getListPage(numPage) {
         const item = this.createItem('li');
-        item.appendChild(this.createLink('a', '2'));
-        list.appendChild(item);
+        item.appendChild(this.createLink('a', numPage));
 
-        return list;
+        return item;
     }
 
     createList(ul) {
@@ -28,7 +31,7 @@ export default class Pagination {
 
     createItem(li) {
         const item =  document.createElement(li);
-        item.classList.add('page-item');
+        item.classList.add(this.buttonSelector);
         return item;
     }
 
@@ -39,7 +42,15 @@ export default class Pagination {
         return link;
     }
 
-    render() {
-        this.wrapper.appendChild(this.createPagination());
+    startPage(pageNum, contactsOnePage) {
+        return (pageNum - 1) * contactsOnePage;
+    }
+
+    endPage(start, contactsOnePage) {
+        return start + contactsOnePage;
+    }
+
+    render(countOfItem) {
+        this.wrapper.appendChild(this.createPagination(countOfItem));
     }
 }
