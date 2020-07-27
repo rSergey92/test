@@ -13,7 +13,6 @@
     "webpack-dev-server": "^3.11.0"
   },
   "browserslist": [
-    "last 2 version",
-    "not dead"
+    "since 2017-06"
   ]
 }
