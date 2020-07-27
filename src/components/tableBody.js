@@ -1,57 +1,101 @@
+import Pagination from "./pagination";
+
 const EVENT = {
     SORT_CELL: 'sorting',
     FILTER_FIELD: 'filter',
 }
 
 export default class TableBody {
-    constructor(table) {
-        this.table = table;
-        this.render();
+    constructor(options) {
+        this.table = options.table;
+        this.pagination = new Pagination(options.wrapper);
+        this.defaultKeys = ['id', 'firstName', 'lastName', 'email', 'phone'];
+        this.contactsOnePage = 12;
+        this.createRow = this.createRow.bind(this);
+        this.createCell = this.createCell.bind(this);
+        this.render(options.dataTable);
     }
 
-    createTableBody() {
+    createTableBody(dataTable) {
         const tbody = document.createElement('tbody');
-        let trow = '';
-        let td = '';
-        let count = 1;
-        const textBody = ['id', 'firstName', 'lastName', 'email', 'phone']
+        this.createPagination(dataTable);
+        const buttonList = document.querySelectorAll(`.${this.pagination.buttonSelector}`);
 
-        for(var i = 0; i < textBody.length; i++) {
-           trow = this.createRow('tr');
-           trow.classList.add('content-table__tr');
-           tbody.appendChild(trow);
+        this.formattedTable({
+            btn: buttonList[0],
+            target: buttonList[0],
+            tbody,
+            dataTable,
+            buttonList,
+        });
 
-            for(var j = 0; j < textBody.length; j++) {
-                td = this.createCell('td');
-                td.setAttribute('data-field-body', textBody[j]);
-                td.innerHTML = count;
-                count++;
-                trow.appendChild(td);
-            }
+        buttonList.forEach(btn => {
+            btn.addEventListener('click', (
+                ({ target }) => this.formattedTable({
+                    btn,
+                    target,
+                    tbody,
+                    dataTable,
+                    buttonList,
+            })));
+        });
+
+        return tbody;
+    }
+
+    formattedTable(options) {
+        const {
+            btn,
+            target,
+            tbody,
+            dataTable,
+            buttonList,
+        } = options;
+
+        this.removeActiveClass(btn, buttonList);
+
+        let pageNum = parseInt(target.innerText,10);
+        let startPage = this.pagination.startPage(pageNum, this.contactsOnePage);
+        let endPage = this.pagination.endPage(startPage, this.contactsOnePage);
+
+        let formattedDataTable = dataTable.slice(startPage, endPage);
+
+        tbody.innerHTML = '';
+        for(let key in formattedDataTable) {
+            let tr = this.createRow('tr');
+            tbody.appendChild(tr);
+
+            this.defaultKeys.forEach(item => {
+                this.createCell(formattedDataTable[key][item], tr);
+            });
         }
 
         return tbody;
     }
 
-    createRow(tr) {
-        return document.createElement(tr);
+    removeActiveClass(btn, btnList) {
+        btnList.forEach(item => {
+            if (item.classList.contains('active')) {
+                item.classList.remove('active');
+            }
+        });
+
+        btn.classList.add('active');
     }
 
-    createCell(td) {
-        return document.createElement(td);
+    createPagination(dataTable) {
+        const countOfItems = Math.ceil(dataTable.length / this.contactsOnePage);
+        this.pagination.render(countOfItems);
     }
 
-    startSort() {
-        window.EventBus.fire(EVENT.SORT_CELL, this.sorting);
+    createRow(row) {
+        return document.createElement(row);
     }
 
-    sorting({ field }) {
-        const cell = [...document.querySelectorAll(`[data-field-body=${field}]`)];
-        const sortCell = cell.map(item => item.innerHTML);
-        const a = sortCell.sort(function(a,b) {
-            return b - a;
-        })
-        console.log(a);
+    createCell(value, tr) {
+        const td = document.createElement('td');
+        td.innerHTML = value;
+        tr.appendChild(td);
     }
 
     filter() {
@@ -62,7 +106,7 @@ export default class TableBody {
         console.log(target.value)
     }
 
-    render() {
-        this.table.appendChild(this.createTableBody());
+    render(dataTable) {
+        this.table.appendChild(this.createTableBody(dataTable));
     }
 }
