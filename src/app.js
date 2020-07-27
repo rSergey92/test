@@ -3,24 +3,20 @@ import api from './api/index.js'
 import Table from './components/table.js';
 import EventBus from './utils';
 
-async function getContent() {
-    let result = undefined;
+const getContent = async function() {
     try {
-       const res = await api.getSmallData();
-       console.log(res);
-       if (res) {
-           result = res;
-       }
+        const res = await api.getSmallData();
+
+        const table = new Table('#test-table', {
+            dataTable: res,
+            minPageSize: 10,
+        });
+
     } catch(err) {
         console.log(err);
     }
-    return result;
 }
 
 window.EventBus = EventBus;
-document.addEventListener('DOMContentLoaded', function() {
-    const table = new Table('#test-table', {
-    //    dataTable: getContent(),
-       minPageSize: 10,
-    })
-})
+
+getContent();
