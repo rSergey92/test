@@ -1,5 +1,6 @@
 import Pagination from "./pagination";
-import Filter from './filter';
+import Filter from './filter'
+import SelectedContact from './selectedContact.js';
 
 const EVENT = {
     SORT_CELL: 'sorting',
@@ -12,6 +13,7 @@ export default class TableBody {
 
         this.pagination = new Pagination(options.wrapper);
         this.filter = new Filter(options.wrapper);
+        this.selectedContact = new SelectedContact(options.wrapper);
 
         this.defaultKeys = ['id', 'firstName', 'lastName', 'email', 'phone'];
         this.contactsOnePage = 12;
@@ -100,6 +102,7 @@ export default class TableBody {
 
     createCell(value, tr) {
         const td = document.createElement('td');
+        td.addEventListener('click', () => this.selectedContact.render());
         td.innerHTML = value;
         tr.appendChild(td);
     }

@@ -15,11 +15,6 @@ export default class Filter {
                 
         return this.input;
     }
-    eventHandlerInput() {
-        if (this.input) {
-            this.input.addEventListener('input', this.changeValue);
-        }
-    }
 
     changeValue({ target }) {
         window.EventBus.on(EVENT.FILTER_FIELD, {
@@ -29,7 +24,5 @@ export default class Filter {
 
     render() {
         this.wrapper.before(this.createInput());
-
-        this.eventHandlerInput()
     }
 }
