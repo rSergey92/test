@@ -32,8 +32,12 @@ export default class Table {
         this.filter = new Filter(this.wrapper);
         this.wrapper.appendChild(this.table);
         this.thead = new TableHeader(this.table);
-        window.TableBody = new TableBody(this.table);
-        this.pagination = new Pagination(this.wrapper);
+        window.TableBody = new TableBody({
+            table: this.table,
+            dataTable: this.props.dataTable,
+            wrapper: this.wrapper,
+        });
+        window.Pagination = new Pagination(this.wrapper);
     }
 
     clickHandler() {
