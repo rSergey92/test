@@ -1,4 +1,5 @@
 import Pagination from "./pagination";
+import Filter from './filter';
 
 const EVENT = {
     SORT_CELL: 'sorting',
@@ -8,7 +9,10 @@ const EVENT = {
 export default class TableBody {
     constructor(options) {
         this.table = options.table;
+
         this.pagination = new Pagination(options.wrapper);
+        this.filter = new Filter(options.wrapper);
+
         this.defaultKeys = ['id', 'firstName', 'lastName', 'email', 'phone'];
         this.contactsOnePage = 12;
         this.createRow = this.createRow.bind(this);
@@ -19,6 +23,7 @@ export default class TableBody {
     createTableBody(dataTable) {
         const tbody = document.createElement('tbody');
         this.createPagination(dataTable);
+        this.filteredTable(dataTable, tbody);
         const buttonList = document.querySelectorAll(`.${this.pagination.buttonSelector}`);
 
         this.formattedTable({
@@ -85,6 +90,7 @@ export default class TableBody {
 
     createPagination(dataTable) {
         const countOfItems = Math.ceil(dataTable.length / this.contactsOnePage);
+        this.filter.render();
         this.pagination.render(countOfItems);
     }
 
@@ -98,12 +104,34 @@ export default class TableBody {
         tr.appendChild(td);
     }
 
-    filter() {
-        window.EventBus.fire(EVENT.FILTER_FIELD, this.filtered);
-    }
+    //Временное решение фильтрации таблицы
+    filteredTable(dataTable, tbody) {
+        const inputField = document.querySelector('.form-control');
+        inputField.addEventListener('input', ({ target }) => {
+            tbody.innerHTML = '';
+            for(let key in dataTable) {
+                let tr = this.createRow('tr');
+                tbody.appendChild(tr);
 
-    filtered({ target }) {
-        console.log(target.value)
+                this.defaultKeys.forEach(item => {
+                    let filter = typeof dataTable[key][item] === 'string'
+                        ? dataTable[key][item].toLowerCase()
+                        : String(dataTable[key][item]);
+
+                    if(filter.indexOf(target.value.toLowerCase()) > -1 && target.value !== '') {
+                        this.createCell(dataTable[key]['id'], tr);
+                        this.createCell(dataTable[key]['firstName'], tr);
+                        this.createCell(dataTable[key]['lastName'], tr);
+                        this.createCell(dataTable[key]['email'], tr);
+                        this.createCell(dataTable[key]['phone'], tr);
+                    }
+
+                    if (target.value === '') {
+                        this.createCell(dataTable[key][item], tr);
+                    }
+                });
+            }
+        });
     }
 
     render(dataTable) {

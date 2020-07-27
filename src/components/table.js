@@ -1,4 +1,3 @@
-import Filter from './filter';
 import TableHeader from './tableHeader';
 import TableBody from './tableBody';
 import Pagination from './pagination';
@@ -29,7 +28,6 @@ export default class Table {
         
         this.containerContent.appendChild(this.wrapper);
 
-        this.filter = new Filter(this.wrapper);
         this.wrapper.appendChild(this.table);
         this.thead = new TableHeader(this.table);
         window.TableBody = new TableBody({

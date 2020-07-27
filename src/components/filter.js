@@ -1,5 +1,3 @@
-import TableBody from './tableBody';
-
 const EVENT = {
     FILTER_FIELD: 'filter',
 }
@@ -7,7 +5,6 @@ const EVENT = {
 export default class Filter {
     constructor(wrapper) {
         this.wrapper = wrapper;
-        this.render();
     }
 
     createInput() {
@@ -28,12 +25,10 @@ export default class Filter {
         window.EventBus.on(EVENT.FILTER_FIELD, {
             target
         });
-
-        window.TableBody.filter();
     }
 
     render() {
-        this.wrapper.appendChild(this.createInput());
+        this.wrapper.before(this.createInput());
 
         this.eventHandlerInput()
     }
