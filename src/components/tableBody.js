@@ -10,6 +10,7 @@ const EVENT = {
 export default class TableBody {
     constructor(options) {
         this.table = options.table;
+        this.dataTable = options.dataTable;
 
         this.pagination = new Pagination(options.wrapper);
         this.filter = new Filter(options.wrapper);
@@ -19,19 +20,34 @@ export default class TableBody {
         this.contactsOnePage = 12;
         this.createRow = this.createRow.bind(this);
         this.createCell = this.createCell.bind(this);
+        this.sortDirection = false;
+
         this.render(options.dataTable);
     }
 
     createTableBody(dataTable) {
-        const tbody = document.createElement('tbody');
+        this.tbody = document.createElement('tbody');
         this.createPagination(dataTable);
-        this.filteredTable(dataTable, tbody);
+        this.filter.render();
+        this.filteredTable(dataTable, this.tbody);
         const buttonList = document.querySelectorAll(`.${this.pagination.buttonSelector}`);
+        const th = document.querySelectorAll('th');
+
+        th.forEach(item => {
+            item.addEventListener('click', () => {
+                this.sortColumn(item, dataTable);
+                this.formattedTable({
+                    btn: buttonList[0],
+                    target: buttonList[0],
+                    dataTable,
+                    buttonList,
+                });
+            });
+        });
 
         this.formattedTable({
             btn: buttonList[0],
             target: buttonList[0],
-            tbody,
             dataTable,
             buttonList,
         });
@@ -41,43 +57,30 @@ export default class TableBody {
                 ({ target }) => this.formattedTable({
                     btn,
                     target,
-                    tbody,
                     dataTable,
                     buttonList,
             })));
         });
 
-        return tbody;
+        return this.tbody;
     }
 
     formattedTable(options) {
         const {
             btn,
-            target,
-            tbody,
-            dataTable,
             buttonList,
         } = options;
-
         this.removeActiveClass(btn, buttonList);
+        this.renderTable(this.setPagination(options));
+    }
 
+    setPagination({ target, dataTable }) {
         let pageNum = parseInt(target.innerText,10);
         let startPage = this.pagination.startPage(pageNum, this.contactsOnePage);
         let endPage = this.pagination.endPage(startPage, this.contactsOnePage);
 
         let formattedDataTable = dataTable.slice(startPage, endPage);
-
-        tbody.innerHTML = '';
-        for(let key in formattedDataTable) {
-            let tr = this.createRow('tr');
-            tbody.appendChild(tr);
-
-            this.defaultKeys.forEach(item => {
-                this.createCell(formattedDataTable[key][item], tr);
-            });
-        }
-
-        return tbody;
+        return formattedDataTable;
     }
 
     removeActiveClass(btn, btnList) {
@@ -92,7 +95,6 @@ export default class TableBody {
 
     createPagination(dataTable) {
         const countOfItems = Math.ceil(dataTable.length / this.contactsOnePage);
-        this.filter.render();
         this.pagination.render(countOfItems);
     }
 
@@ -100,41 +102,65 @@ export default class TableBody {
         return document.createElement(row);
     }
 
-    createCell(value, tr) {
+    createCell(value, tr, name) {
         const td = document.createElement('td');
-        td.addEventListener('click', () => this.selectedContact.render());
+        td.addEventListener('click', ({ target }) => {
+            this.selectedContact.render({
+                name,
+                value,
+                dataTable: this.dataTable,
+            })
+        });
         td.innerHTML = value;
         tr.appendChild(td);
     }
 
     //Временное решение фильтрации таблицы
-    filteredTable(dataTable, tbody) {
+    filteredTable(dataTable) {
         const inputField = document.querySelector('.form-control');
         inputField.addEventListener('input', ({ target }) => {
-            tbody.innerHTML = '';
-            for(let key in dataTable) {
-                let tr = this.createRow('tr');
-                tbody.appendChild(tr);
+        });
+    }
 
-                this.defaultKeys.forEach(item => {
-                    let filter = typeof dataTable[key][item] === 'string'
-                        ? dataTable[key][item].toLowerCase()
-                        : String(dataTable[key][item]);
+    sortColumn(columnName, dataTable) {
+        this.tbody.innerHTML = '';
 
-                    if(filter.indexOf(target.value.toLowerCase()) > -1 && target.value !== '') {
-                        this.createCell(dataTable[key]['id'], tr);
-                        this.createCell(dataTable[key]['firstName'], tr);
-                        this.createCell(dataTable[key]['lastName'], tr);
-                        this.createCell(dataTable[key]['email'], tr);
-                        this.createCell(dataTable[key]['phone'], tr);
-                    }
-
-                    if (target.value === '') {
-                        this.createCell(dataTable[key][item], tr);
-                    }
-                });
+        dataTable = dataTable.sort((a,b) => {
+            if (this.sortDirection) {
+                if (a[columnName.dataset.field] < b[columnName.dataset.field]) {
+                    return -1;
+                } else if (a[columnName.dataset.field] > b[columnName.dataset.field]) {
+                    return 1
+                } else {
+                    return 0
+                }
+            } else {
+                if (a[columnName.dataset.field] > b[columnName.dataset.field]) {
+                    return -1;
+                } else if (a[columnName.dataset.field] < b[columnName.dataset.field]) {
+                    return 1
+                } else {
+                    return 0
+                }
             }
         });
+
+        this.sortDirection = !this.sortDirection;
+        this.renderTable(dataTable);
+    }
+
+    renderTable(formattedDataTable) {
+        this.tbody.innerHTML = '';
+        for(let key in formattedDataTable) {
+            let tr = this.createRow('tr');
+            this.tbody.appendChild(tr);
+
+            this.defaultKeys.forEach(item => {
+                this.createCell(formattedDataTable[key][item], tr, item);
+            });
+        }
+
+        return this.tbody;
     }
 
     render(dataTable) {

@@ -5,7 +5,6 @@ export default class TableHeader {
     constructor(table) {
         this.table = table;
         this.classSort = {
-            defaultClass: 'fa-sort',
             asc: 'fa-sort-asc',
             desc: 'fa-sort-desc',
         }
@@ -20,7 +19,7 @@ export default class TableHeader {
         for(let i = 0; i < textHeader.length; i++) {
             let th = document.createElement('th');
             let icon = document.createElement('i');
-            icon.classList.add('fa', 'fa-sort', 'ml-3');
+            icon.classList.add('fa', 'fa-sort-desc', 'ml-3');
 
             th.setAttribute('data-field', textHeader[i]);
             th.innerHTML = textHeader[i];
@@ -41,20 +40,16 @@ export default class TableHeader {
 
     changeClass(icon) {
         const {
-            defaultClass,
             asc,
             desc,
         } = this.classSort;
 
-        if (icon.classList.contains(defaultClass)) {
-            icon.classList.remove(defaultClass);
-            icon.classList.add(desc);
-        } else if (icon.classList.contains(desc)) {
+        if (icon.classList.contains(desc)) {
             icon.classList.remove(desc);
             icon.classList.add(asc);
         } else {
             icon.classList.remove(asc);
-            icon.classList.add(defaultClass);   
+            icon.classList.add(desc);
         }
     }
 
