@@ -1,6 +1,3 @@
-const EVENT = {
-    SORT_CELL: 'sorting'
-}
 export default class TableHeader {
     constructor(table) {
         this.table = table;

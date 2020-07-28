@@ -6,8 +6,8 @@ export default class Table {
     constructor(containerId, options = {}) {
         this.props = {
             ...options,
-        }
-        this.eventSort = new Event('clickSort');
+        };
+
         this.initTable(containerId);
     }
 
@@ -36,13 +36,5 @@ export default class Table {
             wrapper: this.wrapper,
         });
         window.Pagination = new Pagination(this.wrapper);
-    }
-
-    clickHandler() {
-        this.thead.clickHandler();
-    }
-
-    renderContent() {
-        this.pagination.render();
     }
 }

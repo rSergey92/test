@@ -2,11 +2,6 @@ import Pagination from "./pagination";
 import Filter from './filter'
 import SelectedContact from './selectedContact.js';
 
-const EVENT = {
-    SORT_CELL: 'sorting',
-    FILTER_FIELD: 'filter',
-}
-
 export default class TableBody {
     constructor(options) {
         this.table = options.table;
@@ -76,7 +71,6 @@ export default class TableBody {
         const {
             btn,
             buttonList,
-            dataTable,
         } = options;
         this.removeActiveClass(btn, buttonList);
         this.renderTable(this.setPagination(options));
@@ -86,7 +80,7 @@ export default class TableBody {
         let pageNum = parseInt(target.innerText,10);
         let startPage = this.pagination.startPage(pageNum, this.contactsOnePage);
         let endPage = this.pagination.endPage(startPage, this.contactsOnePage);
-
+        
         let formattedDataTable = dataTable.slice(startPage, endPage);
         return formattedDataTable;
     }

@@ -1,7 +1,3 @@
-const EVENT = {
-    FILTER_FIELD: 'filter',
-}
-
 export default class Filter {
     constructor(wrapper) {
         this.wrapper = wrapper;
@@ -14,12 +10,6 @@ export default class Filter {
         this.input.classList.add('form-control');
                 
         return this.input;
-    }
-
-    changeValue({ target }) {
-        window.EventBus.on(EVENT.FILTER_FIELD, {
-            target
-        });
     }
 
     render() {
