@@ -18,6 +18,7 @@ export default class TableBody {
 
         this.defaultKeys = ['id', 'firstName', 'lastName', 'email', 'phone'];
         this.contactsOnePage = 12;
+        this.rowList = [];
         this.createRow = this.createRow.bind(this);
         this.createCell = this.createCell.bind(this);
         this.sortDirection = false;
@@ -103,8 +104,16 @@ export default class TableBody {
     }
 
     createCell(value, tr, name) {
+        this.rowList.push(tr);
         const td = document.createElement('td');
         td.addEventListener('click', ({ target }) => {
+            this.rowList.forEach(row => {
+                if (row.classList.contains('bg-primary')) {
+                    row.classList.remove('text-white');
+                    row.classList.remove('bg-primary');
+                }
+            })
+            tr.classList.add('bg-primary', 'text-white');
             this.selectedContact.render({
                 name,
                 value,
