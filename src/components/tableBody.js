@@ -30,7 +30,6 @@ export default class TableBody {
         this.tbody = document.createElement('tbody');
         this.createPagination(dataTable);
         this.filter.render();
-        this.filteredTable(dataTable, this.tbody);
         const buttonList = document.querySelectorAll(`.${this.pagination.buttonSelector}`);
         const th = document.querySelectorAll('th');
 
@@ -47,6 +46,13 @@ export default class TableBody {
         });
 
         this.formattedTable({
+            btn: buttonList[0],
+            target: buttonList[0],
+            dataTable,
+            buttonList,
+        });
+
+        this.filteredTable({
             btn: buttonList[0],
             target: buttonList[0],
             dataTable,
@@ -70,6 +76,7 @@ export default class TableBody {
         const {
             btn,
             buttonList,
+            dataTable,
         } = options;
         this.removeActiveClass(btn, buttonList);
         this.renderTable(this.setPagination(options));
@@ -124,10 +131,25 @@ export default class TableBody {
         tr.appendChild(td);
     }
 
-    //Временное решение фильтрации таблицы
-    filteredTable(dataTable) {
+    filteredTable(options) {
+        const {
+            dataTable,
+        } = options;
+
         const inputField = document.querySelector('.form-control');
         inputField.addEventListener('input', ({ target }) => {
+            let res = dataTable.filter((item, index) => {
+                if (String(item['id']).indexOf(target.value) > -1) return item;
+                if (item['firstName'].toLowerCase().indexOf(target.value) > -1) return item;
+                if (item['lastName'].toLowerCase().indexOf(target.value) > -1) return item;
+                if (item['email'].toLowerCase().indexOf(target.value) > -1) return item;
+                if (item['phone'].toLowerCase().indexOf(target.value) > -1) return item;
+            });
+
+            this.formattedTable({
+                ...options,
+                dataTable: res,
+            });
         });
     }
 
