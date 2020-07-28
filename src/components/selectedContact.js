@@ -8,7 +8,12 @@ export default class SelectedContact {
     }
 
     createBlockContacts({ name, value, dataTable }) {
+        const heading = document.createElement('h2');
+        heading.innerHTML = 'Выбранный контакт';
+        heading.classList.add('form-group');
+
         this.container.innerHTML = '';
+        this.container.appendChild(heading);
         for (let key in dataTable) {
             if (dataTable[key][name] == value) {
                 const account = SelectedContact.setDataContacts({
@@ -54,12 +59,13 @@ export default class SelectedContact {
     }
 
     static setDataContacts(options) {
-        const groupSelector = document.createElement('div');
         const {
             title,
             text,
             selector,
         } = options;
+
+        const groupSelector = document.createElement('div');
         const titleSelector = document.createElement('span');
         const textSelector = document.createElement(selector);
         titleSelector.innerHTML = title;
@@ -67,6 +73,7 @@ export default class SelectedContact {
 
         groupSelector.appendChild(titleSelector);
         groupSelector.appendChild(textSelector);
+
         return groupSelector
     }
 
