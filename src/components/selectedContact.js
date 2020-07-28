@@ -1,48 +1,56 @@
+/*
+* TODO: Необходимо избавиться от дублиорвания
+* */
 export default class SelectedContact {
     constructor(wrapper) {
         this.wrapper = wrapper;
+        this.container = document.createElement('div');
     }
 
-    createBlockContacts() {
-        const wrapper = document.createElement('div');
-        const account = SelectedContact.setDataContacts({
-            title: 'Выбран пользователь',
-            text: '',
-            selector: 'b'
-        });
-        const desc = SelectedContact.setDataContacts({
-            title: 'Описание',
-            text: '',
-            selector: 'textarea'
-        });
-        const address = SelectedContact.setDataContacts({
-            title: 'Адрес проживания:',
-            text: '',
-            selector: 'b'
-        });
-        const city = SelectedContact.setDataContacts({
-            title: 'Город',
-            text: '',
-            selector: 'b'
-        });
-        const state = SelectedContact.setDataContacts({
-            title: 'Провинция/штат',
-            text: '',
-            selector: 'b'
-        });
-        const code = SelectedContact.setDataContacts({
-            title: 'Индекс',
-            text: '',
-            selector: 'b'
-        });
-        wrapper.appendChild(account);
-        wrapper.appendChild(desc);
-        wrapper.appendChild(address);
-        wrapper.appendChild(city);
-        wrapper.appendChild(state);
-        wrapper.appendChild(code);
+    createBlockContacts({ name, value, dataTable }) {
+        this.container.innerHTML = '';
+        for (let key in dataTable) {
+            if (dataTable[key][name] == value) {
+                const account = SelectedContact.setDataContacts({
+                    title: 'Выбран пользователь:',
+                    text: dataTable[key]['id'],
+                    selector: 'b'
+                });
+                const desc = SelectedContact.setDataContacts({
+                    title: 'Описание:',
+                    text: dataTable[key]['description'],
+                    selector: 'textarea'
+                });
+                const address = SelectedContact.setDataContacts({
+                    title: 'Адрес проживания:',
+                    text: dataTable[key]['adress']['streetAddress'],
+                    selector: 'b'
+                });
+                const city = SelectedContact.setDataContacts({
+                    title: 'Город:',
+                    text: dataTable[key]['adress']['city'],
+                    selector: 'b'
+                });
+                const state = SelectedContact.setDataContacts({
+                    title: 'Провинция/штат:',
+                    text: dataTable[key]['adress']['state'],
+                    selector: 'b'
+                });
+                const zip = SelectedContact.setDataContacts({
+                    title: 'Индекс:',
+                    text: dataTable[key]['adress']['zip'],
+                    selector: 'b'
+                });
+                this.container.appendChild(account);
+                this.container.appendChild(desc);
+                this.container.appendChild(address);
+                this.container.appendChild(city);
+                this.container.appendChild(state);
+                this.container.appendChild(zip);
+            }
+        }
 
-        return wrapper
+        return this.container;
     }
 
     static setDataContacts(options) {
@@ -62,7 +70,7 @@ export default class SelectedContact {
         return groupSelector
     }
 
-    render() {
-        this.wrapper.appendChild(this.createBlockContacts());
+    render(options) {
+        this.wrapper.appendChild(this.createBlockContacts(options));
     }
 }
